@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mikroagra - Zahradnictví ve Spytihněvi</title>
+    <meta name="description" content="Mikroagra - sadbové brambory, semena, hnojiva, krmiva a zahradnické potřeby ve Spytihněvi.">
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+</head>
+<body>
+
+<!-- Navigace -->
+<nav class="navbar" id="navbar">
+    <div class="container nav-container">
+        <a href="#" class="logo">
+            <span class="logo-icon">🌱</span> Mikroagra
+        </a>
+        <button class="nav-toggle" id="navToggle" aria-label="Menu">
+            <span></span><span></span><span></span>
+        </button>
+        <ul class="nav-links" id="navLinks">
+            <li><a href="#o-nas">O nás</a></li>
+            <li><a href="#sortiment">Sortiment</a></li>
+            <li><a href="#brambory">Brambory</a></li>
+            <li><a href="#oteviraci-doba">Otevírací doba</a></li>
+            <li><a href="#kontakt">Kontakt</a></li>
+        </ul>
+    </div>
+</nav>
+
+<!-- Hero sekce -->
+<header class="hero" id="hero">
+    <div class="hero-overlay"></div>
+    <div class="container hero-content">
+        <h1>Mikroagra</h1>
+        <p class="hero-subtitle">Váš zahradnický obchod ve Spytihněvi</p>
+        <p class="hero-desc">Sadbové brambory, semena, hnojiva, krmiva a vše pro vaši zahradu.</p>
+        <div class="hero-buttons">
+            <a href="#sortiment" class="btn btn-primary">Prohlédnout sortiment</a>
+            <a href="#kontakt" class="btn btn-outline">Kontaktujte nás</a>
+        </div>
+    </div>
+</header>
+
+<!-- O nás -->
+<section class="section" id="o-nas">
+    <div class="container">
+        <h2 class="section-title">O nás</h2>
+        <div class="about-grid">
+            <div class="about-text">
+                <p>
+                    Jsme malý rodinný obchod ve <strong>Spytihněvi</strong>, který se specializuje na zahradnické potřeby.
+                    Nabízíme široký výběr sadbových brambor, semen, hnojiv, krmiv pro domácí zvířata
+                    a zemědělských postřiků.
+                </p>
+                <p>
+                    Naše zkušenosti a individuální přístup k zákazníkům nám umožňují poskytnout
+                    odborné poradenství pro vaši zahradu i malé hospodářství.
+                </p>
+                <div class="about-features">
+                    <div class="feature">
+                        <span class="feature-icon">🌿</span>
+                        <span>Kvalitní sadbový materiál</span>
+                    </div>
+                    <div class="feature">
+                        <span class="feature-icon">🤝</span>
+                        <span>Osobní přístup</span>
+                    </div>
+                    <div class="feature">
+                        <span class="feature-icon">📦</span>
+                        <span>Široký sortiment</span>
+                    </div>
+                </div>
+            </div>
+            <div class="about-image">
+                <img src="MikroagraEntrance.png" alt="Náš obchod ve Spytihněvi" class="about-photo">
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Sortiment -->
+<section class="section section-alt" id="sortiment">
+    <div class="container">
+        <h2 class="section-title">Náš sortiment</h2>
+        <p class="section-subtitle">Vše co potřebujete pro vaši zahradu a hospodářství</p>
+        <div class="products-grid">
+            <div class="product-card">
+                <div class="product-icon">🥔</div>
+                <h3>Sadbové brambory</h3>
+                <p>Široký výběr odrůd: Sunita, Rosara, Belarosa, Impala, Anuschka, Marabel, Soraya, Bernina, Laura, Simoneta a další.</p>
+            </div>
+            <div class="product-card">
+                <div class="product-icon">🥔</div>
+                <h3>Konzumní brambory</h3>
+                <p>Čerstvé konzumní brambory v různých baleních pro domácí spotřebu.</p>
+            </div>
+            <div class="product-card">
+                <div class="product-icon">🌾</div>
+                <h3>Semena</h3>
+                <p>Pšenice, ječmen, oves, kukuřice a další obilniny pro vaši potřebu.</p>
+            </div>
+            <div class="product-card">
+                <div class="product-icon">🧪</div>
+                <h3>Hnojiva</h3>
+                <p>Hnojiva pro zdravé rostliny a bohatou úrodu ve vaší zahradě.</p>
+            </div>
+            <div class="product-card">
+                <div class="product-icon">🐔</div>
+                <h3>Krmiva</h3>
+                <p>Kvalitní krmiva pro domácí a hospodářská zvířata.</p>
+            </div>
+            <div class="product-card">
+                <div class="product-icon">🌿</div>
+                <h3>Postřiky</h3>
+                <p>Zemědělské postřiky pro ochranu vašich plodin a rostlin.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Brambory ceník -->
+<section class="section" id="brambory">
+    <div class="container">
+        <h2 class="section-title">Sadbové brambory – ceník</h2>
+        <p class="section-subtitle">Aktuální ceny sadby pro sezónu 2026</p>
+        <div class="price-table-wrapper">
+            <table class="price-table">
+                <thead>
+                    <tr>
+                        <th>Balení</th>
+                        <th>Cena za kg</th>
+                        <th>Poznámka</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Rozváž (volně)</td>
+                        <td class="price">20 Kč/kg</td>
+                        <td>Libovolné množství</td>
+                    </tr>
+                    <tr>
+                        <td>Balení 5 kg</td>
+                        <td class="price">25 Kč/kg</td>
+                        <td>Balené po 5 kg</td>
+                    </tr>
+                    <tr>
+                        <td>Balení 10 kg</td>
+                        <td class="price">23 Kč/kg</td>
+                        <td>Balené po 10 kg</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <div class="varieties">
+            <h3>Dostupné odrůdy</h3>
+            <div class="variety-tags">
+                <span class="tag">Sunita</span>
+                <span class="tag">Rosara</span>
+                <span class="tag">Belarosa</span>
+                <span class="tag">Impala</span>
+                <span class="tag">Anuschka</span>
+                <span class="tag">Marabel</span>
+                <span class="tag">Soraya</span>
+                <span class="tag">Bernina</span>
+                <span class="tag">Laura</span>
+                <span class="tag">Simoneta</span>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Otevírací doba -->
+<section class="section section-alt" id="oteviraci-doba">
+    <div class="container">
+        <h2 class="section-title">Otevírací doba</h2>
+        <div class="hours-card">
+            <div class="hours-grid">
+                <div class="hours-row closed">
+                    <span class="day">Pondělí</span>
+                    <span class="time">Zavřeno</span>
+                </div>
+                <div class="hours-row">
+                    <span class="day">Úterý</span>
+                    <span class="time">8:00 – 17:00</span>
+                </div>
+                <div class="hours-row">
+                    <span class="day">Středa</span>
+                    <span class="time">8:00 – 17:00</span>
+                </div>
+                <div class="hours-row">
+                    <span class="day">Čtvrtek</span>
+                    <span class="time">8:00 – 17:00</span>
+                </div>
+                <div class="hours-row">
+                    <span class="day">Pátek</span>
+                    <span class="time">8:00 – 17:00</span>
+                </div>
+                <div class="hours-row weekend">
+                    <span class="day">Sobota</span>
+                    <span class="time">8:00 – 11:00</span>
+                </div>
+                <div class="hours-row weekend closed">
+                    <span class="day">Neděle</span>
+                    <span class="time">Zavřeno</span>
+                </div>
+            </div>
+            <p class="hours-note">
+                * Otevírací dobu doporučujeme ověřit telefonicky, zejména o svátcích a v období dovolené.
+            </p>
+        </div>
+    </div>
+</section>
+
+<!-- Kontakt -->
+<section class="section" id="kontakt">
+    <div class="container">
+        <h2 class="section-title">Kontakt</h2>
+        <div class="contact-grid">
+            <div class="contact-info">
+                <div class="contact-item">
+                    <span class="contact-icon">👤</span>
+                    <div>
+                        <strong>Pavla Šťastná</strong>
+                        <p>Mikroagra ve Spytihněvi</p>
+                    </div>
+                </div>
+                <div class="contact-item">
+                    <span class="contact-icon">📞</span>
+                    <div>
+                        <strong>Telefon</strong>
+                        <p><a href="tel:+420777030087">777 030 087</a></p>
+                    </div>
+                </div>
+                <div class="contact-item">
+                    <span class="contact-icon">✉️</span>
+                    <div>
+                        <strong>E-mail</strong>
+                        <p><a href="mailto:stastna@mikroagra.cz">stastna@mikroagra.cz</a></p>
+                    </div>
+                </div>
+                <div class="contact-item">
+                    <span class="contact-icon">📍</span>
+                    <div>
+                        <strong>Adresa</strong>
+                        <p>Spytihněv, okr. Zlín</p>
+                    </div>
+                </div>
+            </div>
+            <div class="contact-map">
+                <iframe
+                    src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d1300!2d17.4935198!3d49.1428337!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x4713122f03d9ede9%3A0xfa09ed79277affa3!2sMIKROAGRA%20Pavla%20%C5%A0%C5%A5astn%C3%A1!5e0!3m2!1scs!2scz!4v1"
+                    width="100%"
+                    height="350"
+                    style="border:0; border-radius: 12px;"
+                    allowfullscreen=""
+                    loading="lazy"
+                    referrerpolicy="no-referrer-when-downgrade">
+                </iframe>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Patička -->
+<footer class="footer">
+    <div class="container">
+        <div class="footer-content">
+            <div class="footer-brand">
+                <span class="logo-icon">🌱</span> <strong>Mikroagra</strong>
+                <p>Pavla Šťastná – Spytihněv</p>
+            </div>
+            <div class="footer-links">
+                <a href="#o-nas">O nás</a>
+                <a href="#sortiment">Sortiment</a>
+                <a href="#oteviraci-doba">Otevírací doba</a>
+                <a href="#kontakt">Kontakt</a>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2026 Mikroagra – Pavla Šťastná. Všechna práva vyhrazena.</p>
+        </div>
+    </div>
+</footer>
+
+<script src="script.js"></script>
+</body>
+</html>
