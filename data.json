@@ -12,9 +12,33 @@
     }
   ],
   "cenik": [
-    { "baleni": "Rozváž (volně)", "cena": "20 Kč/kg", "poznamka": "Libovolné množství" },
-    { "baleni": "Balení 5 kg", "cena": "25 Kč/kg", "poznamka": "Balené po 5 kg" },
-    { "baleni": "Balení 10 kg", "cena": "23 Kč/kg", "poznamka": "Balené po 10 kg" }
+    {
+      "baleni": "Rozváž (volně)",
+      "cena": "20 Kč/kg",
+      "poznamka": "Libovolné množství"
+    },
+    {
+      "baleni": "Balení 5 kg",
+      "cena": "25 Kč/kg",
+      "poznamka": "Balené po 5 kg"
+    },
+    {
+      "baleni": "Balení 10 kg",
+      "cena": "23 Kč/kg",
+      "poznamka": "Balené po 10 kg"
+    }
   ],
-  "odrudy": ["Sunita", "Rosara", "Belarosa", "Impala", "Anuschka", "Marabel", "Soraya", "Bernina", "Laura", "Simoneta"]
+  "odrudy": [
+    "Sunita",
+    "Rosara",
+    "Belarosa",
+    "Impala",
+    "Anuschka",
+    "Marabel",
+    "Soraya",
+    "Bernina",
+    "Laura",
+    "Simoneta",
+    "AAA"
+  ]
 }
