@@ -497,7 +497,8 @@ async function publish() {
                 document.getElementById('publishBar').style.display = 'none';
                 throw new Error('Neplatný token – zadejte nový');
             }
-            throw new Error('Nepodařilo se načíst soubor z GitHubu');
+            const err = await getResp.json().catch(() => ({}));
+            throw new Error(`GitHub: ${getResp.status} – ${err.message || 'nepodařilo se načíst soubor'}`);
         }
 
         const fileInfo = await getResp.json();
@@ -520,7 +521,10 @@ async function publish() {
             }
         );
 
-        if (!putResp.ok) throw new Error('Nepodařilo se uložit');
+        if (!putResp.ok) {
+            const err = await putResp.json().catch(() => ({}));
+            throw new Error(`GitHub: ${putResp.status} – ${err.message || 'neznámá chyba'}`);
+        }
 
         showStatus('Publikováno! Změny budou na webu za cca 1 minutu.');
         statusEl.textContent = 'Poslední publikace: právě teď';
