@@ -1,0 +1,460 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Správa novinek – Mikroagra</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+    <style>
+        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+        :root {
+            --green-dark: #2d5016;
+            --green: #3a7d1e;
+            --green-light: #5fa33a;
+            --green-pale: #e8f5e0;
+            --red: #c0392b;
+            --red-pale: #fde8e8;
+            --text: #1a1a1a;
+            --text-light: #555;
+            --text-muted: #888;
+            --white: #ffffff;
+            --gray-bg: #f5f5f5;
+            --border: #e0e0e0;
+            --shadow: 0 2px 16px rgba(0,0,0,0.08);
+            --radius: 12px;
+            --radius-sm: 8px;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            color: var(--text);
+            line-height: 1.6;
+            background: var(--gray-bg);
+            min-height: 100vh;
+        }
+
+        /* ===== Header ===== */
+        .admin-header {
+            background: var(--green-dark);
+            color: var(--white);
+            padding: 20px 0;
+        }
+
+        .admin-header .container {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .admin-header h1 {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.4rem;
+            font-weight: 700;
+        }
+
+        .admin-header a {
+            color: rgba(255,255,255,0.7);
+            text-decoration: none;
+            font-size: 0.9rem;
+        }
+
+        .admin-header a:hover { color: var(--white); }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 0 24px;
+        }
+
+        /* ===== Toolbar ===== */
+        .toolbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 24px 0 16px;
+        }
+
+        .toolbar h2 {
+            font-size: 1.1rem;
+            color: var(--text-light);
+            font-weight: 500;
+        }
+
+        /* ===== Buttons ===== */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 10px 20px;
+            border: none;
+            border-radius: var(--radius-sm);
+            font-size: 0.9rem;
+            font-weight: 600;
+            font-family: inherit;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-primary {
+            background: var(--green);
+            color: var(--white);
+        }
+
+        .btn-primary:hover {
+            background: var(--green-light);
+        }
+
+        .btn-sm {
+            padding: 6px 14px;
+            font-size: 0.82rem;
+        }
+
+        .btn-outline {
+            background: transparent;
+            border: 1px solid var(--border);
+            color: var(--text-light);
+        }
+
+        .btn-outline:hover {
+            border-color: var(--green);
+            color: var(--green);
+        }
+
+        .btn-danger {
+            background: transparent;
+            border: 1px solid var(--red);
+            color: var(--red);
+        }
+
+        .btn-danger:hover {
+            background: var(--red);
+            color: var(--white);
+        }
+
+        /* ===== Novinka card v seznamu ===== */
+        .novinky-admin-list {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            padding-bottom: 40px;
+        }
+
+        .novinka-admin-card {
+            background: var(--white);
+            border-radius: var(--radius);
+            padding: 20px 24px;
+            box-shadow: var(--shadow);
+            border-left: 4px solid var(--green);
+        }
+
+        .novinka-admin-card .meta {
+            font-size: 0.82rem;
+            color: var(--text-muted);
+            margin-bottom: 4px;
+        }
+
+        .novinka-admin-card h3 {
+            font-size: 1.05rem;
+            color: var(--green-dark);
+            margin-bottom: 6px;
+        }
+
+        .novinka-admin-card p {
+            color: var(--text-light);
+            font-size: 0.92rem;
+            margin-bottom: 14px;
+        }
+
+        .novinka-admin-card .actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: var(--text-muted);
+            font-size: 0.95rem;
+        }
+
+        /* ===== Formulář (nová / upravit) ===== */
+        .form-card {
+            background: var(--white);
+            border-radius: var(--radius);
+            padding: 28px;
+            box-shadow: var(--shadow);
+            margin-bottom: 24px;
+            display: none;
+        }
+
+        .form-card.visible { display: block; }
+
+        .form-card h3 {
+            font-family: 'Playfair Display', serif;
+            color: var(--green-dark);
+            font-size: 1.2rem;
+            margin-bottom: 20px;
+        }
+
+        .field {
+            margin-bottom: 16px;
+        }
+
+        .field label {
+            display: block;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--text-light);
+            margin-bottom: 6px;
+        }
+
+        .field input,
+        .field textarea {
+            width: 100%;
+            padding: 10px 14px;
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            font-size: 0.95rem;
+            font-family: inherit;
+            transition: border-color 0.2s;
+        }
+
+        .field input:focus,
+        .field textarea:focus {
+            outline: none;
+            border-color: var(--green);
+        }
+
+        .field textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+
+        .form-actions {
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+            margin-top: 8px;
+        }
+
+        /* ===== Status zpráva ===== */
+        .status-msg {
+            position: fixed;
+            bottom: 24px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--green-dark);
+            color: var(--white);
+            padding: 12px 28px;
+            border-radius: var(--radius);
+            font-size: 0.9rem;
+            font-weight: 500;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+            opacity: 0;
+            transition: opacity 0.3s;
+            pointer-events: none;
+        }
+
+        .status-msg.show { opacity: 1; }
+
+        @media (max-width: 640px) {
+            .toolbar { flex-direction: column; gap: 12px; align-items: stretch; }
+            .novinka-admin-card .actions { flex-wrap: wrap; }
+        }
+    </style>
+</head>
+<body>
+
+<header class="admin-header">
+    <div class="container">
+        <h1>🌱 Správa novinek</h1>
+        <a href="index.html">← Zpět na web</a>
+    </div>
+</header>
+
+<main class="container">
+    <div class="toolbar">
+        <h2 id="countLabel"></h2>
+        <button class="btn btn-primary" id="btnNew">+ Nová novinka</button>
+    </div>
+
+    <!-- Formulář pro vytvoření / úpravu -->
+    <div class="form-card" id="formCard">
+        <h3 id="formTitle">Nová novinka</h3>
+        <div class="field">
+            <label for="fDatum">Datum</label>
+            <input type="date" id="fDatum">
+        </div>
+        <div class="field">
+            <label for="fTitulek">Titulek</label>
+            <input type="text" id="fTitulek" placeholder="Nadpis novinky">
+        </div>
+        <div class="field">
+            <label for="fText">Text</label>
+            <textarea id="fText" placeholder="Obsah novinky…"></textarea>
+        </div>
+        <div class="form-actions">
+            <button class="btn btn-outline" id="btnCancel">Zrušit</button>
+            <button class="btn btn-primary" id="btnSave">Uložit</button>
+        </div>
+    </div>
+
+    <!-- Seznam novinek -->
+    <div class="novinky-admin-list" id="list"></div>
+</main>
+
+<div class="status-msg" id="statusMsg"></div>
+
+<script>
+const DATA_FILE = 'data.json';
+const STORAGE_KEY = 'mikroagra_data';
+let data = null;
+let editIndex = -1; // -1 = nová, >= 0 = editace
+
+// ===== Inicializace =====
+document.addEventListener('DOMContentLoaded', async () => {
+    await loadData();
+    renderList();
+
+    document.getElementById('btnNew').addEventListener('click', openNew);
+    document.getElementById('btnCancel').addEventListener('click', closeForm);
+    document.getElementById('btnSave').addEventListener('click', saveForm);
+});
+
+// ===== Data =====
+async function loadData() {
+    // Zkusit localStorage
+    const saved = localStorage.getItem(STORAGE_KEY);
+    if (saved) {
+        try { data = JSON.parse(saved); return; } catch {}
+    }
+    // Fallback: soubor
+    try {
+        const resp = await fetch(DATA_FILE + '?t=' + Date.now());
+        data = await resp.json();
+    } catch {
+        data = { novinky: [] };
+    }
+}
+
+function persist() {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+}
+
+// ===== Vykreslení seznamu =====
+function renderList() {
+    const list = document.getElementById('list');
+    const novinky = data.novinky || [];
+    document.getElementById('countLabel').textContent =
+        novinky.length === 0 ? 'Žádné novinky' :
+        novinky.length === 1 ? '1 novinka' :
+        novinky.length < 5 ? novinky.length + ' novinky' :
+        novinky.length + ' novinek';
+
+    if (novinky.length === 0) {
+        list.innerHTML = '<div class="empty-state">Zatím žádné novinky. Přidejte první!</div>';
+        return;
+    }
+
+    list.innerHTML = novinky.map((n, i) => `
+        <div class="novinka-admin-card">
+            <div class="meta">${formatDate(n.datum)}</div>
+            <h3>${esc(n.titulek)}</h3>
+            <p>${esc(n.text)}</p>
+            <div class="actions">
+                <button class="btn btn-sm btn-outline" onclick="openEdit(${i})">Upravit</button>
+                <button class="btn btn-sm btn-danger" onclick="deleteNovinka(${i})">Smazat</button>
+            </div>
+        </div>
+    `).join('');
+}
+
+// ===== Formulář =====
+function openNew() {
+    editIndex = -1;
+    document.getElementById('formTitle').textContent = 'Nová novinka';
+    document.getElementById('fDatum').value = new Date().toISOString().split('T')[0];
+    document.getElementById('fTitulek').value = '';
+    document.getElementById('fText').value = '';
+    document.getElementById('formCard').classList.add('visible');
+    document.getElementById('fTitulek').focus();
+}
+
+function openEdit(i) {
+    editIndex = i;
+    const n = data.novinky[i];
+    document.getElementById('formTitle').textContent = 'Upravit novinku';
+    document.getElementById('fDatum').value = n.datum;
+    document.getElementById('fTitulek').value = n.titulek;
+    document.getElementById('fText').value = n.text;
+    document.getElementById('formCard').classList.add('visible');
+    document.getElementById('fTitulek').focus();
+}
+
+function closeForm() {
+    document.getElementById('formCard').classList.remove('visible');
+    editIndex = -1;
+}
+
+function saveForm() {
+    const datum = document.getElementById('fDatum').value;
+    const titulek = document.getElementById('fTitulek').value.trim();
+    const text = document.getElementById('fText').value.trim();
+
+    if (!titulek) {
+        document.getElementById('fTitulek').focus();
+        return;
+    }
+
+    const novinka = { datum, titulek, text };
+
+    if (editIndex >= 0) {
+        data.novinky[editIndex] = novinka;
+        showStatus('Novinka upravena');
+    } else {
+        data.novinky.unshift(novinka);
+        showStatus('Novinka přidána');
+    }
+
+    persist();
+    closeForm();
+    renderList();
+}
+
+// ===== Smazání =====
+function deleteNovinka(i) {
+    const n = data.novinky[i];
+    if (!confirm(`Smazat novinku „${n.titulek}"?`)) return;
+    data.novinky.splice(i, 1);
+    persist();
+    renderList();
+    showStatus('Novinka smazána');
+}
+
+// ===== Status =====
+function showStatus(msg) {
+    const el = document.getElementById('statusMsg');
+    el.textContent = msg;
+    el.classList.add('show');
+    setTimeout(() => el.classList.remove('show'), 2500);
+}
+
+// ===== Pomocné =====
+function formatDate(str) {
+    try {
+        return new Date(str + 'T00:00:00').toLocaleDateString('cs-CZ', {
+            day: 'numeric', month: 'long', year: 'numeric'
+        });
+    } catch { return str; }
+}
+
+function esc(s) {
+    const d = document.createElement('div');
+    d.textContent = s;
+    return d.innerHTML;
+}
+</script>
+</body>
+</html>
