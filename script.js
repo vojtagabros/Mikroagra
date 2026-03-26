@@ -31,13 +31,14 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
     });
 
-    // Načíst a zobrazit novinky z data.json
+    // Načíst data a zobrazit dynamické sekce
     try {
         const resp = await fetch('data.json?t=' + Date.now());
         const data = await resp.json();
         renderNovinky(data.novinky || []);
+        renderCenik(data.cenik || []);
     } catch (e) {
-        console.error('Chyba při načítání novinek:', e);
+        console.error('Chyba při načítání dat:', e);
     }
 });
 
@@ -53,6 +54,18 @@ function renderNovinky(novinky) {
             <h3 class="novinka-titulek">${esc(n.titulek)}</h3>
             <p class="novinka-text">${esc(n.text)}</p>
         </article>
+    `).join('');
+}
+
+function renderCenik(cenik) {
+    const tbody = document.getElementById('cenikBody');
+    if (!tbody) return;
+    tbody.innerHTML = cenik.map(r => `
+        <tr>
+            <td>${esc(r.baleni)}</td>
+            <td class="price">${esc(r.cena)}</td>
+            <td>${esc(r.poznamka)}</td>
+        </tr>
     `).join('');
 }
 

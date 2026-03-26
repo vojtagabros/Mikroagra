@@ -387,36 +387,6 @@ a:hover {
     font-size: 1.1rem !important;
 }
 
-.varieties {
-    text-align: center;
-}
-
-.varieties h3 {
-    font-size: 1.2rem;
-    margin-bottom: 16px;
-    color: var(--green-dark);
-}
-
-.variety-tags {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 10px;
-    justify-content: center;
-}
-
-.tag {
-    background: var(--green-pale);
-    color: var(--green-dark);
-    padding: 8px 18px;
-    border-radius: 50px;
-    font-size: 0.9rem;
-    font-weight: 500;
-    transition: background 0.2s;
-}
-
-.tag:hover {
-    background: #d4edcc;
-}
 
 /* ===== Oteviraci doba ===== */
 .hours-card {

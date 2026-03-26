@@ -391,6 +391,103 @@
         .app-content { display: none; }
         .app-content.visible { display: block; }
 
+        /* ===== Admin sekce nadpisy ===== */
+        .admin-section-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.2rem;
+            color: var(--green-dark);
+            padding: 32px 0 12px;
+            border-bottom: 2px solid var(--green-pale);
+            margin-bottom: 16px;
+        }
+
+        /* ===== Ceník tabulka v adminu ===== */
+        .cenik-table {
+            width: 100%;
+            border-collapse: collapse;
+            background: var(--white);
+            border-radius: var(--radius);
+            overflow: hidden;
+            box-shadow: var(--shadow);
+            margin-bottom: 16px;
+        }
+
+        .cenik-table th {
+            background: var(--green-dark);
+            color: var(--white);
+            padding: 10px 16px;
+            text-align: left;
+            font-size: 0.82rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .cenik-table td {
+            padding: 10px 16px;
+            border-bottom: 1px solid #eee;
+            font-size: 0.9rem;
+        }
+
+        .cenik-table tr:last-child td { border-bottom: none; }
+
+        .cenik-table .actions-cell {
+            white-space: nowrap;
+            text-align: right;
+        }
+
+        /* ===== Odrůdy tagy ===== */
+        .odrudy-card {
+            background: var(--white);
+            border-radius: var(--radius);
+            padding: 20px 24px;
+            box-shadow: var(--shadow);
+            margin-bottom: 16px;
+        }
+
+        .odrudy-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .odruda-tag {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: var(--green-pale);
+            color: var(--green-dark);
+            padding: 6px 14px;
+            border-radius: 50px;
+            font-size: 0.88rem;
+            font-weight: 500;
+        }
+
+        .odruda-tag button {
+            background: none;
+            border: none;
+            color: var(--red);
+            font-size: 1.1rem;
+            cursor: pointer;
+            line-height: 1;
+            font-weight: 700;
+            padding: 0 2px;
+        }
+
+        .odruda-tag button:hover { color: #e74c3c; }
+
+        .tag-add-btn {
+            border: 2px dashed var(--green);
+            background: transparent;
+            color: var(--green-dark);
+            padding: 6px 14px;
+            border-radius: 50px;
+            font-size: 0.88rem;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .tag-add-btn:hover { background: var(--green-pale); }
+
         @media (max-width: 640px) {
             .publish-bar { flex-direction: column; align-items: stretch; }
             .token-row { flex-direction: column; }
@@ -468,6 +565,48 @@
 
     <!-- Seznam novinek -->
     <div class="novinky-admin-list" id="list"></div>
+
+    <!-- Ceník brambor -->
+    <h2 class="admin-section-title">Ceník brambor</h2>
+    <table class="cenik-table">
+        <thead>
+            <tr>
+                <th>Balení</th>
+                <th>Cena</th>
+                <th>Poznámka</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody id="cenikList"></tbody>
+    </table>
+    <button class="btn btn-outline" id="btnAddCenik">+ Přidat řádek</button>
+
+    <!-- Formulář pro ceník -->
+    <div class="form-card" id="cenikFormCard">
+        <h3 id="cenikFormTitle">Přidat do ceníku</h3>
+        <div class="field">
+            <label for="fBaleni">Balení</label>
+            <input type="text" id="fBaleni" placeholder="např. Balení 5 kg">
+        </div>
+        <div class="field">
+            <label for="fCena">Cena</label>
+            <input type="text" id="fCena" placeholder="např. 25 Kč/kg">
+        </div>
+        <div class="field">
+            <label for="fPoznamka">Poznámka</label>
+            <input type="text" id="fPoznamka" placeholder="např. Balené po 5 kg">
+        </div>
+        <div class="form-actions">
+            <button class="btn btn-outline" id="btnCenikCancel">Zrušit</button>
+            <button class="btn btn-primary" id="btnCenikSave">Uložit</button>
+        </div>
+    </div>
+
+    <!-- Odrůdy -->
+    <h2 class="admin-section-title">Odrůdy brambor</h2>
+    <div class="odrudy-card">
+        <div class="odrudy-tags" id="odrudyList"></div>
+    </div>
 </main>
 
 </div><!-- /app-content -->
@@ -536,11 +675,16 @@ async function initApp() {
     setupToken();
     await loadData();
     renderList();
+    renderCenikList();
+    renderOdrudyList();
 
     document.getElementById('btnNew').addEventListener('click', openNew);
     document.getElementById('btnCancel').addEventListener('click', closeForm);
     document.getElementById('btnSave').addEventListener('click', saveForm);
     document.getElementById('btnPublish').addEventListener('click', publish);
+    document.getElementById('btnAddCenik').addEventListener('click', openNewCenik);
+    document.getElementById('btnCenikCancel').addEventListener('click', closeCenikForm);
+    document.getElementById('btnCenikSave').addEventListener('click', saveCenikForm);
 }
 
 // ===== Token =====
@@ -753,6 +897,111 @@ function deleteNovinka(i) {
     persist();
     renderList();
     showStatus('Novinka smazána – nezapomeňte publikovat');
+}
+
+// ===== Ceník =====
+let cenikEditIndex = -1;
+
+function renderCenikList() {
+    const tbody = document.getElementById('cenikList');
+    const cenik = data.cenik || [];
+    tbody.innerHTML = cenik.map((r, i) => `
+        <tr>
+            <td>${esc(r.baleni)}</td>
+            <td>${esc(r.cena)}</td>
+            <td>${esc(r.poznamka)}</td>
+            <td class="actions-cell">
+                <button class="btn btn-sm btn-outline" onclick="openEditCenik(${i})">Upravit</button>
+                <button class="btn btn-sm btn-danger" onclick="deleteCenik(${i})">Smazat</button>
+            </td>
+        </tr>
+    `).join('');
+}
+
+function openNewCenik() {
+    cenikEditIndex = -1;
+    document.getElementById('cenikFormTitle').textContent = 'Přidat do ceníku';
+    document.getElementById('fBaleni').value = '';
+    document.getElementById('fCena').value = '';
+    document.getElementById('fPoznamka').value = '';
+    document.getElementById('cenikFormCard').classList.add('visible');
+    document.getElementById('fBaleni').focus();
+}
+
+function openEditCenik(i) {
+    cenikEditIndex = i;
+    const r = data.cenik[i];
+    document.getElementById('cenikFormTitle').textContent = 'Upravit ceník';
+    document.getElementById('fBaleni').value = r.baleni;
+    document.getElementById('fCena').value = r.cena;
+    document.getElementById('fPoznamka').value = r.poznamka;
+    document.getElementById('cenikFormCard').classList.add('visible');
+    document.getElementById('fBaleni').focus();
+}
+
+function closeCenikForm() {
+    document.getElementById('cenikFormCard').classList.remove('visible');
+    cenikEditIndex = -1;
+}
+
+function saveCenikForm() {
+    const baleni = document.getElementById('fBaleni').value.trim();
+    const cena = document.getElementById('fCena').value.trim();
+    const poznamka = document.getElementById('fPoznamka').value.trim();
+    if (!baleni || !cena) { document.getElementById('fBaleni').focus(); return; }
+
+    if (!data.cenik) data.cenik = [];
+    const item = { baleni, cena, poznamka };
+
+    if (cenikEditIndex >= 0) {
+        data.cenik[cenikEditIndex] = item;
+        showStatus('Ceník upraven – nezapomeňte publikovat');
+    } else {
+        data.cenik.push(item);
+        showStatus('Řádek přidán – nezapomeňte publikovat');
+    }
+
+    persist();
+    closeCenikForm();
+    renderCenikList();
+}
+
+function deleteCenik(i) {
+    if (!confirm(`Smazat „${data.cenik[i].baleni}"?`)) return;
+    data.cenik.splice(i, 1);
+    persist();
+    renderCenikList();
+    showStatus('Řádek smazán – nezapomeňte publikovat');
+}
+
+// ===== Odrůdy =====
+function renderOdrudyList() {
+    const container = document.getElementById('odrudyList');
+    const odrudy = data.odrudy || [];
+    container.innerHTML = odrudy.map((o, i) => `
+        <span class="odruda-tag">
+            ${esc(o)}
+            <button onclick="deleteOdruda(${i})">&times;</button>
+        </span>
+    `).join('') + `<button class="tag-add-btn" onclick="addOdruda()">+ Přidat</button>`;
+}
+
+function addOdruda() {
+    const name = prompt('Název nové odrůdy:');
+    if (!name || !name.trim()) return;
+    if (!data.odrudy) data.odrudy = [];
+    data.odrudy.push(name.trim());
+    persist();
+    renderOdrudyList();
+    showStatus('Odrůda přidána – nezapomeňte publikovat');
+}
+
+function deleteOdruda(i) {
+    if (!confirm(`Smazat odrůdu „${data.odrudy[i]}"?`)) return;
+    data.odrudy.splice(i, 1);
+    persist();
+    renderOdrudyList();
+    showStatus('Odrůda smazána – nezapomeňte publikovat');
 }
 
 // ===== Status =====
