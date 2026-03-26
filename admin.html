@@ -259,7 +259,76 @@
 
         .status-msg.show { opacity: 1; }
 
+        /* ===== Publish bar ===== */
+        .publish-bar {
+            background: var(--white);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            padding: 20px 24px;
+            margin-bottom: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+        }
+
+        .publish-bar p {
+            font-size: 0.88rem;
+            color: var(--text-light);
+        }
+
+        .btn-publish {
+            background: #2563eb;
+            color: var(--white);
+            white-space: nowrap;
+        }
+
+        .btn-publish:hover { background: #3b82f6; }
+        .btn-publish:disabled { opacity: 0.6; cursor: not-allowed; }
+
+        /* ===== Token setup ===== */
+        .token-setup {
+            background: var(--white);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            padding: 24px;
+            margin-bottom: 24px;
+        }
+
+        .token-setup h3 {
+            font-size: 1rem;
+            color: var(--green-dark);
+            margin-bottom: 8px;
+        }
+
+        .token-setup p {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            margin-bottom: 12px;
+        }
+
+        .token-row {
+            display: flex;
+            gap: 10px;
+        }
+
+        .token-row input {
+            flex: 1;
+            padding: 8px 12px;
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            font-size: 0.9rem;
+            font-family: inherit;
+        }
+
+        .token-row input:focus {
+            outline: none;
+            border-color: var(--green);
+        }
+
         @media (max-width: 640px) {
+            .publish-bar { flex-direction: column; align-items: stretch; }
+            .token-row { flex-direction: column; }
             .toolbar { flex-direction: column; gap: 12px; align-items: stretch; }
             .novinka-admin-card .actions { flex-wrap: wrap; }
         }
@@ -278,6 +347,22 @@
     <div class="toolbar">
         <h2 id="countLabel"></h2>
         <button class="btn btn-primary" id="btnNew">+ Nová novinka</button>
+    </div>
+
+    <!-- GitHub token -->
+    <div class="token-setup" id="tokenSetup">
+        <h3>Propojení s GitHub</h3>
+        <p>Zadejte GitHub Personal Access Token pro publikování novinek na web. Token se uloží pouze ve vašem prohlížeči.</p>
+        <div class="token-row">
+            <input type="password" id="tokenInput" placeholder="ghp_xxxxxxxxxxxx">
+            <button class="btn btn-primary" id="btnTokenSave">Uložit token</button>
+        </div>
+    </div>
+
+    <!-- Publikovat -->
+    <div class="publish-bar" id="publishBar" style="display:none">
+        <p id="publishStatus">Změny budou po publikování viditelné pro všechny návštěvníky.</p>
+        <button class="btn btn-publish" id="btnPublish">Publikovat na web</button>
     </div>
 
     <!-- Formulář pro vytvoření / úpravu -->
@@ -308,28 +393,73 @@
 <div class="status-msg" id="statusMsg"></div>
 
 <script>
+const GITHUB_OWNER = 'vojtagabros';
+const GITHUB_REPO = 'Mikroagra';
 const DATA_FILE = 'data.json';
 const STORAGE_KEY = 'mikroagra_data';
+const TOKEN_KEY = 'mikroagra_gh_token';
+
 let data = null;
-let editIndex = -1; // -1 = nová, >= 0 = editace
+let editIndex = -1;
 
 // ===== Inicializace =====
 document.addEventListener('DOMContentLoaded', async () => {
+    setupToken();
     await loadData();
     renderList();
 
     document.getElementById('btnNew').addEventListener('click', openNew);
     document.getElementById('btnCancel').addEventListener('click', closeForm);
     document.getElementById('btnSave').addEventListener('click', saveForm);
+    document.getElementById('btnPublish').addEventListener('click', publish);
 });
+
+// ===== Token =====
+function setupToken() {
+    const saved = localStorage.getItem(TOKEN_KEY);
+    if (saved) {
+        showPublishBar();
+    }
+    document.getElementById('btnTokenSave').addEventListener('click', () => {
+        const token = document.getElementById('tokenInput').value.trim();
+        if (!token) return;
+        localStorage.setItem(TOKEN_KEY, token);
+        showPublishBar();
+        showStatus('Token uložen');
+    });
+}
+
+function showPublishBar() {
+    document.getElementById('tokenSetup').style.display = 'none';
+    document.getElementById('publishBar').style.display = 'flex';
+}
 
 // ===== Data =====
 async function loadData() {
-    // Zkusit localStorage
+    // Vždy načíst aktuální stav z GitHubu (pokud máme token)
+    const token = localStorage.getItem(TOKEN_KEY);
+    if (token) {
+        try {
+            const resp = await fetch(
+                `https://api.github.com/repos/${GITHUB_OWNER}/${GITHUB_REPO}/contents/${DATA_FILE}`,
+                { headers: { 'Authorization': `token ${token}` } }
+            );
+            if (resp.ok) {
+                const info = await resp.json();
+                const content = decodeURIComponent(escape(atob(info.content)));
+                data = JSON.parse(content);
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+                return;
+            }
+        } catch {}
+    }
+
+    // Fallback: localStorage
     const saved = localStorage.getItem(STORAGE_KEY);
     if (saved) {
         try { data = JSON.parse(saved); return; } catch {}
     }
+
     // Fallback: soubor
     try {
         const resp = await fetch(DATA_FILE + '?t=' + Date.now());
@@ -341,6 +471,65 @@ async function loadData() {
 
 function persist() {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+}
+
+// ===== Publikování na GitHub =====
+async function publish() {
+    const token = localStorage.getItem(TOKEN_KEY);
+    if (!token) { showStatus('Nejdříve zadejte GitHub token'); return; }
+
+    const btn = document.getElementById('btnPublish');
+    const statusEl = document.getElementById('publishStatus');
+    btn.disabled = true;
+    btn.textContent = 'Publikuji…';
+
+    try {
+        // Získat SHA aktuálního souboru
+        const getResp = await fetch(
+            `https://api.github.com/repos/${GITHUB_OWNER}/${GITHUB_REPO}/contents/${DATA_FILE}`,
+            { headers: { 'Authorization': `token ${token}` } }
+        );
+
+        if (!getResp.ok) {
+            if (getResp.status === 401) {
+                localStorage.removeItem(TOKEN_KEY);
+                document.getElementById('tokenSetup').style.display = 'block';
+                document.getElementById('publishBar').style.display = 'none';
+                throw new Error('Neplatný token – zadejte nový');
+            }
+            throw new Error('Nepodařilo se načíst soubor z GitHubu');
+        }
+
+        const fileInfo = await getResp.json();
+        const content = btoa(unescape(encodeURIComponent(JSON.stringify(data, null, 2) + '\n')));
+
+        // Commitnout nový obsah
+        const putResp = await fetch(
+            `https://api.github.com/repos/${GITHUB_OWNER}/${GITHUB_REPO}/contents/${DATA_FILE}`,
+            {
+                method: 'PUT',
+                headers: {
+                    'Authorization': `token ${token}`,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    message: 'Aktualizace novinek z redakce',
+                    content: content,
+                    sha: fileInfo.sha
+                })
+            }
+        );
+
+        if (!putResp.ok) throw new Error('Nepodařilo se uložit');
+
+        showStatus('Publikováno! Změny budou na webu za cca 1 minutu.');
+        statusEl.textContent = 'Poslední publikace: právě teď';
+    } catch (e) {
+        showStatus('Chyba: ' + e.message);
+    } finally {
+        btn.disabled = false;
+        btn.textContent = 'Publikovat na web';
+    }
 }
 
 // ===== Vykreslení seznamu =====
@@ -412,10 +601,10 @@ function saveForm() {
 
     if (editIndex >= 0) {
         data.novinky[editIndex] = novinka;
-        showStatus('Novinka upravena');
+        showStatus('Novinka upravena – nezapomeňte publikovat');
     } else {
         data.novinky.unshift(novinka);
-        showStatus('Novinka přidána');
+        showStatus('Novinka přidána – nezapomeňte publikovat');
     }
 
     persist();
@@ -430,7 +619,7 @@ function deleteNovinka(i) {
     data.novinky.splice(i, 1);
     persist();
     renderList();
-    showStatus('Novinka smazána');
+    showStatus('Novinka smazána – nezapomeňte publikovat');
 }
 
 // ===== Status =====
@@ -438,7 +627,7 @@ function showStatus(msg) {
     const el = document.getElementById('statusMsg');
     el.textContent = msg;
     el.classList.add('show');
-    setTimeout(() => el.classList.remove('show'), 2500);
+    setTimeout(() => el.classList.remove('show'), 3000);
 }
 
 // ===== Pomocné =====

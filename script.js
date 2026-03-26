@@ -31,21 +31,14 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
     });
 
-    // Načíst a zobrazit novinky (localStorage má přednost)
-    let novinky = [];
-    const saved = localStorage.getItem('mikroagra_data');
-    if (saved) {
-        try { novinky = JSON.parse(saved).novinky || []; } catch {}
-    } else {
-        try {
-            const resp = await fetch('data.json?t=' + Date.now());
-            const data = await resp.json();
-            novinky = data.novinky || [];
-        } catch (e) {
-            console.error('Chyba při načítání novinek:', e);
-        }
+    // Načíst a zobrazit novinky z data.json
+    try {
+        const resp = await fetch('data.json?t=' + Date.now());
+        const data = await resp.json();
+        renderNovinky(data.novinky || []);
+    } catch (e) {
+        console.error('Chyba při načítání novinek:', e);
     }
-    renderNovinky(novinky);
 });
 
 function renderNovinky(novinky) {
