@@ -37,6 +37,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         const data = await resp.json();
         renderNovinky(data.novinky || []);
         renderCenik(data.cenik || []);
+        renderOdrudy(data.odrudy || []);
     } catch (e) {
         console.error('Chyba při načítání dat:', e);
     }
@@ -67,6 +68,14 @@ function renderCenik(cenik) {
             <td>${esc(r.poznamka)}</td>
         </tr>
     `).join('');
+}
+
+function renderOdrudy(odrudy) {
+    const section = document.getElementById('odrudySection');
+    const container = document.getElementById('odrudyTags');
+    if (!section || !container || odrudy.length === 0) return;
+    section.style.display = '';
+    container.innerHTML = odrudy.map(o => `<span class="tag">${esc(o)}</span>`).join('');
 }
 
 function formatDate(str) {
